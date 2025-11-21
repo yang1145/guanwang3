@@ -1,6 +1,24 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { fetchSiteConfig, SiteConfig } from '../services/api';
 
 export default function QualityPolicy() {
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+
+  useEffect(() => {
+    const loadSiteConfig = async () => {
+      try {
+        const config = await fetchSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('Failed to load site config:', error);
+      }
+    };
+
+    loadSiteConfig();
+  }, []);
+
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
@@ -11,7 +29,7 @@ export default function QualityPolicy() {
           <div className="md:w-1/2 md:pl-16">
             <h2 className="text-3xl font-bold text-gray-800 mb-6">质量方针</h2>
             <p className="text-gray-600 mb-6">
-              华纺集团始终坚持"质量第一、客户至上"的质量方针，致力于为客户提供最优质的产品和服务。
+              {siteConfig?.company_name || '华纺集团'}始终坚持"质量第一、客户至上"的质量方针，致力于为客户提供最优质的产品和服务。
             </p>
             <div className="space-y-4">
               <div className="flex items-start">

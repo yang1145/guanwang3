@@ -1,6 +1,24 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { fetchSiteConfig, SiteConfig } from '../services/api';
 
 export default function Footer() {
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+
+  useEffect(() => {
+    const loadSiteConfig = async () => {
+      try {
+        const config = await fetchSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('Failed to load site config:', error);
+      }
+    };
+
+    loadSiteConfig();
+  }, []);
+
   return (
     <footer className="bg-gray-800 text-white py-12">
       <div className="container mx-auto px-4">
@@ -8,10 +26,10 @@ export default function Footer() {
           <div>
             <div className="flex items-center space-x-2 mb-6">
               <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
-              <h3 className="text-xl font-bold">华纺集团</h3>
+              <h3 className="text-xl font-bold">{siteConfig?.company_name || '华纺集团'}</h3>
             </div>
             <p className="text-gray-400 mb-4">
-              专注纺织行业三十余载，致力于提供高品质纺织产品和服务。
+              {siteConfig?.company_description || '专注纺织行业三十余载，致力于提供高品质纺织产品和服务。'}
             </p>
             <div className="flex space-x-4">
               {[1, 2, 3, 4].map((item) => (
@@ -56,7 +74,21 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-gray-700 mt-10 pt-6 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} 华纺集团版权所有</p>
+          <p className="mb-2">{siteConfig?.copyright_info || `© ${new Date().getFullYear()} ${siteConfig?.company_name || '华纺集团'}版权所有`}</p>
+          {siteConfig?.icp_number && (
+            <p className="mb-2">
+              <a href="http://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                {siteConfig.icp_number}
+              </a>
+            </p>
+          )}
+          {siteConfig?.police_number && (
+            <p>
+              <a href="http://www.beian.gov.cn/" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                {siteConfig.police_number}
+              </a>
+            </p>
+          )}
         </div>
       </div>
     </footer>

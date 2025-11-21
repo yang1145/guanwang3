@@ -6,14 +6,12 @@ import Footer from '@/components/Footer';
 import PageTitle from '@/components/PageTitle';
 import ProductCategories from '@/components/products/ProductCategories';
 import ProductList from '@/components/products/ProductList';
-import { fetchProducts, extractProductCategories, ProductCategory, Product } from '@/services/api';
+import { fetchProducts, fetchProductCategories, ProductCategory, Product } from '@/services/api';
 
 export default function ProductsPage() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,13 +21,14 @@ export default function ProductsPage() {
       setError(null);
       
       try {
-        // 获取产品列表
-        const productsData = await fetchProducts(selectedCategory !== null ? selectedCategory : undefined);
-        setProducts(productsData);
+        // 并行获取分类和产品数据
+        const [categoriesData, productsData] = await Promise.all([
+          fetchProductCategories(),
+          fetchProducts(selectedCategory)
+        ]);
         
-        // 从产品数据中提取分类
-        const categoriesData = extractProductCategories(productsData);
         setCategories(categoriesData);
+        setProducts(productsData);
       } catch (err) {
         setError('获取数据失败，请稍后重试');
         console.error('Error loading data:', err);
@@ -39,15 +38,10 @@ export default function ProductsPage() {
     };
 
     loadData();
-  }, [selectedCategory, currentPage]);
+  }, [selectedCategory]);
 
   const handleCategoryChange = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
-    setCurrentPage(1); // 重置到第一页
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
   };
 
   return (

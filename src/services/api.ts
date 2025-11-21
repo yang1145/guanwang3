@@ -128,6 +128,22 @@ export const fetchNewsDetail = async (id: number): Promise<NewsDetailItem> => {
   }
 };
 
+// 网站配置数据类型
+export interface SiteConfig {
+  id: number;
+  company_name: string;
+  site_url: string;
+  icp_number: string;
+  police_number: string;
+  copyright_info: string;
+  company_description: string;
+  seo_keywords: string;
+  site_title: string;
+  friend_links: Array<{ name: string; url: string }>;
+  created_at: string;
+  updated_at: string;
+}
+
 // 从产品数据中提取分类
 export const extractProductCategories = (products: Product[]): ProductCategory[] => {
   const categoriesMap = new Map<number, ProductCategory>();
@@ -145,12 +161,29 @@ export const extractProductCategories = (products: Product[]): ProductCategory[]
   return Array.from(categoriesMap.values());
 };
 
+// 获取网站配置信息
+export const fetchSiteConfig = async (): Promise<SiteConfig> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/site-config`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching site config:', error);
+    throw error;
+  }
+};
+
 // 获取产品列表
-export const fetchProducts = async (category: number | undefined): Promise<Product[]> => {
+export const fetchProducts = async (category?: number): Promise<Product[]> => {
   try {
     let url = `${API_BASE_URL}/products`;
     
-    if (category !== undefined) {
+    if (category !== undefined && category !== null) {
       url += `?category=${category}`;
     }
     
@@ -165,5 +198,22 @@ export const fetchProducts = async (category: number | undefined): Promise<Produ
   } catch (error) {
     console.error('Error fetching products:', error);
     throw error; // 重新抛出错误以便上层组件可以处理
+  }
+};
+
+// 获取所有产品分类
+export const fetchProductCategories = async (): Promise<ProductCategory[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/categories`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching product categories:', error);
+    throw error;
   }
 };

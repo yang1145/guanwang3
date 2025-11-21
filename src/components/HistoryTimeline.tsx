@@ -1,13 +1,33 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { fetchSiteConfig, SiteConfig } from '../services/api';
 
 export default function HistoryTimeline() {
-  const historyItems = [
-    { year: '1990年', description: '华纺集团正式成立，专注于传统纺织品生产', side: 'left' },
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+
+  useEffect(() => {
+    const loadSiteConfig = async () => {
+      try {
+        const config = await fetchSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('Failed to load site config:', error);
+      }
+    };
+
+    loadSiteConfig();
+  }, []);
+
+  const getDefaultHistoryItems = () => [
+    { year: '1990年', description: `${siteConfig?.company_name || '华纺集团'}正式成立，专注于传统纺织品生产`, side: 'left' },
     { year: '1995年', description: '引进第一条现代化生产线，产能提升300%', side: 'right' },
     { year: '2005年', description: '通过ISO9001质量管理体系认证', side: 'left' },
     { year: '2010年', description: '产品出口至欧美市场，开启国际化进程', side: 'right' },
     { year: '2020年', description: '建立研发中心，加强产品创新能力', side: 'left' },
   ];
+
+  const historyItems = getDefaultHistoryItems();
 
   return (
     <section className="py-20 bg-gray-50">

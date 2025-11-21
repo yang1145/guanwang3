@@ -18,9 +18,7 @@ export default function ProductCategories({
   onCategoryChange 
 }: ProductCategoriesProps) {
   const handleCategoryClick = (categoryId: number | null) => {
-    // 如果点击的是已选中的分类，则取消选择（显示所有分类）
-    const newCategory = selectedCategory === categoryId ? null : categoryId;
-    onCategoryChange && onCategoryChange(newCategory);
+    onCategoryChange && onCategoryChange(categoryId);
   };
 
   return (

@@ -1,7 +1,25 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { fetchSiteConfig, SiteConfig } from '../services/api';
 
 export default function CompanyIntro() {
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+
+  useEffect(() => {
+    const loadSiteConfig = async () => {
+      try {
+        const config = await fetchSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('Failed to load site config:', error);
+      }
+    };
+
+    loadSiteConfig();
+  }, []);
+
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
@@ -9,7 +27,7 @@ export default function CompanyIntro() {
           <div className="md:w-1/2 mb-10 md:mb-0">
             <Image 
               src="/banner2.jpg" 
-              alt="华纺集团公司简介" 
+              alt={`${siteConfig?.company_name || '华纺集团'}公司简介`} 
               width={500} 
               height={300} 
               className="rounded-xl shadow-lg w-full h-96 object-cover"
@@ -18,8 +36,12 @@ export default function CompanyIntro() {
           <div className="md:w-1/2 md:pl-16">
             <h2 className="text-3xl font-bold text-gray-800 mb-6">公司简介</h2>
             <p className="text-gray-600 mb-6">
-              华纺集团成立于1990年，是一家专业从事纺织品研发、生产与销售的企业。
-              经过三十余年的发展，已成为行业内具有影响力的企业之一。
+              {siteConfig?.company_description || (
+                <>
+                  华纺集团成立于1990年，是一家专业从事纺织品研发、生产与销售的企业。
+                  经过三十余年的发展，已成为行业内具有影响力的企业之一。
+                </>
+              )}
             </p>
             <p className="text-gray-600 mb-6">
               我们拥有一支经验丰富的团队，在传统纺织工艺的基础上不断创新，

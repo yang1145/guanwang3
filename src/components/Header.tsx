@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { fetchSiteConfig, SiteConfig } from '../services/api';
 
 interface HeaderProps {
   currentPage: string;
@@ -9,6 +10,20 @@ interface HeaderProps {
 
 export default function Header({ currentPage }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+
+  useEffect(() => {
+    const loadSiteConfig = async () => {
+      try {
+        const config = await fetchSiteConfig();
+        setSiteConfig(config);
+      } catch (error) {
+        console.error('Failed to load site config:', error);
+      }
+    };
+
+    loadSiteConfig();
+  }, []);
 
   const navItems = [
     { name: '首页', path: '/' },
@@ -29,7 +44,7 @@ export default function Header({ currentPage }: HeaderProps) {
       <div className="container mx-auto px-4 py-6 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-          <h1 className="text-2xl font-bold text-gray-800">华纺集团</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{siteConfig?.company_name || '华纺集团'}</h1>
         </div>
         
         <nav className="hidden md:block">
