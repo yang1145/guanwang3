@@ -24,7 +24,7 @@ export default function ProductsPage() {
         // 并行获取分类和产品数据
         const [categoriesData, productsData] = await Promise.all([
           fetchProductCategories(),
-          fetchProducts(selectedCategory)
+          fetchProducts(selectedCategory !== null ? selectedCategory : undefined)
         ]);
         
         setCategories(categoriesData);
